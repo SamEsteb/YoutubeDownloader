@@ -191,9 +191,13 @@ class DownloadTab(ctk.CTkFrame):
         )
         self._path_button.pack(side="left", fill="x", expand=True)
         
-        # === Botón descargar ===
+        # === Botón descargar con progress bar ===
+        self._download_frame = ctk.CTkFrame(self, fg_color="transparent")
+        self._download_frame.pack(fill="x", padx=25, pady=(10, 15))
+        
+        # Botón de descarga
         self._download_button = ctk.CTkButton(
-            self,
+            self._download_frame,
             text="⬇️ DESCARGAR",
             command=self._on_download,
             font=Fonts.HEADER,
@@ -203,7 +207,17 @@ class DownloadTab(ctk.CTkFrame):
             text_color="#FFFFFF",
             border_width=0,
         )
-        self._download_button.pack(fill="x", padx=25, pady=(10, 15))
+        self._download_button.pack(fill="x")
+        
+        # Progress bar integrada (invisible inicialmente)
+        self._button_progress = ctk.CTkProgressBar(
+            self._download_frame,
+            progress_color="#4CAF50",
+            height=4,
+        )
+        self._button_progress.pack(fill="x", pady=(0, 0))
+        self._button_progress.set(0)
+        self._button_progress.pack_forget()
         
         # === Progreso ===
         self._progress_card = ctk.CTkFrame(
@@ -318,7 +332,11 @@ class DownloadTab(ctk.CTkFrame):
         self._progress_bar.set(0)
         self._progress_label.configure(text="Iniciando...")
         
-        self._download_button.configure(state="disabled", text="Descargando...")
+        # Mostrar progress bar en el botón
+        self._button_progress.pack(fill="x", pady=(0, 0))
+        self._button_progress.set(0)
+        
+        self._download_button.configure(state="disabled", text="⬇️ Descargando... 0%")
         self._is_downloading = True
         
         def download():
@@ -351,8 +369,16 @@ class DownloadTab(ctk.CTkFrame):
             percent = progress.percent / 100
             self._progress_bar.set(percent)
             
+            # Actualizar progress bar del botón
+            self._button_progress.set(percent)
+            
             speed_kb = progress.speed / 1024 if progress.speed else 0
             speed_str = f"{speed_kb:.0f} KB/s" if speed_kb < 1024 else f"{speed_kb/1024:.1f} MB/s"
+            
+            # Actualizar texto del botón con progreso
+            self.after(0, lambda p=progress.percent: self._download_button.configure(
+                text=f"⬇️ Descargando... {p:.0f}%"
+            ))
             
             self.after(0, lambda: self._progress_label.configure(
                 text=f"{progress.percent:.0f}% • {speed_str}"
@@ -361,7 +387,9 @@ class DownloadTab(ctk.CTkFrame):
     def _download_complete(self, filename: str) -> None:
         """Maneja la descarga completada."""
         self._progress_bar.set(1)
+        self._button_progress.set(1)
         self._progress_label.configure(text="✅ Completado!")
+        self._download_button.configure(text="✅ Descargado!")
         
         self._show_success(f"✅ {Path(filename).name}", filename)
     
@@ -369,6 +397,9 @@ class DownloadTab(ctk.CTkFrame):
         """Limpia el estado después de la descarga."""
         self._is_downloading = False
         self._download_button.configure(state="normal", text="⬇️ DESCARGAR")
+        self._button_progress.set(0)
+        self._button_progress.pack_forget()
+        self._progress_bar.set(0)
     
     def _show_error(self, message: str) -> None:
         """Muestra un mensaje de error."""

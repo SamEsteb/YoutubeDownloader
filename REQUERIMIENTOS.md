@@ -14,13 +14,28 @@ Este documento especifica los requisitos funcionales y no funcionales de la apli
 
 **Criterios de Aceptación:**
 
-- [ ] La aplicación acepta una URL válida de YouTube (youtube.com/watch?v=..., youtu.be/..., youtube.com/shorts/...)
-- [ ] La aplicación muestra un mensaje de error claro si la URL es inválida o está vacía
-- [ ] El usuario puede seleccionar la calidad/tamaño del video antes de descargar
-- [ ] La descarga muestra progreso en tiempo real (porcentaje, velocidad, tiempo estimado)
-- [ ] El video se guarda en la ubicación seleccionada por el usuario
-- [ ] El nombre del archivo descargado corresponde al título del video (sanitizado)
+- [x] La aplicación acepta una URL válida de YouTube (youtube.com/watch?v=..., youtu.be/..., youtube.com/shorts/...)
+- [x] La aplicación muestra un mensaje de error claro si la URL es inválida o está vacía
+- [x] El usuario puede seleccionar la calidad/tamaño del video antes de descargar
+- [x] La descarga muestra progreso en tiempo real (porcentaje, velocidad, tiempo estimado)
+- [x] El video se guarda en la ubicación seleccionada por el usuario
+- [x] El nombre del archivo descargado corresponde al título del video (sanitizado)
 - [ ] Si la descarga se interrumpe, el usuario puede reanudar o reiniciar
+
+---
+
+### HU-001b: Indicador de Progreso en Botón
+
+**Como** usuario descargando un video,
+**Quiero** ver el progreso de descarga directamente en el botón de descarga,
+**Para** saber visualmente cuánto falta sin necesidad de mirar la barra de progreso inferior.
+
+**Criterios de Aceptación:**
+
+- [ ] El botón de descarga muestra una barra de progreso integrada mientras descarga
+- [ ] El porcentaje de descarga se muestra en el botón
+- [ ] El botón cambia de color según el progreso (ej: verde cuando completa)
+- [ ] El estado del botón vuelve a normal al terminar la descarga
 
 ---
 

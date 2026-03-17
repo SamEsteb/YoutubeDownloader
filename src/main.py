@@ -5,13 +5,21 @@ Este archivo es el punto de entrada principal de la aplicación.
 """
 
 import sys
+import os
 from pathlib import Path
 
-# Agregar el directorio src y src/app al path para poder importar los módulos
-src_path = Path(__file__).parent
+# Determinar si estamos ejecutando como script o como ejecutable
+if getattr(sys, 'frozen', False):
+    # Ejecutable empaqueado (PyInstaller)
+    base_path = Path(sys._MEIPASS)
+else:
+    # Ejecución normal como script
+    base_path = Path(__file__).parent
+
+# Agregar rutas al path
+src_path = base_path
 app_path = src_path / "app"
 
-# Agregar ambos paths
 paths_to_add = [
     str(src_path),
     str(app_path),
