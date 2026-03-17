@@ -157,6 +157,8 @@ class VideoDownloader:
     
     def _find_ffmpeg(self) -> Optional[str]:
         """Busca FFmpeg en el sistema."""
+        import sys
+        
         # Primero verificar si hay una ruta configurada
         if self._config.ffmpeg_path:
             ffmpeg_path = Path(self._config.ffmpeg_path)
@@ -187,6 +189,21 @@ class VideoDownloader:
                 return ffmpeg_path
         except FileNotFoundError:
             pass
+        
+        # Verificar en la carpeta del ejecutable (cuando está empaquetado)
+        if getattr(sys, 'frozen', False):
+            # Estamos en modo empaquetado (PyInstaller)
+            exe_dir = Path(sys.executable).parent
+            ffmpeg_exe = exe_dir / "ffmpeg.exe"
+            if ffmpeg_exe.exists():
+                self._logger.info(f"FFmpeg encontrado en carpeta del exe: {ffmpeg_exe}")
+                return str(ffmpeg_exe)
+            
+            # También buscar en subcarpeta bin
+            ffmpeg_bin = exe_dir / "bin" / "ffmpeg.exe"
+            if ffmpeg_bin.exists():
+                self._logger.info(f"FFmpeg encontrado en carpeta del exe: {ffmpeg_bin}")
+                return str(ffmpeg_bin)
         
         # Verificar ubicación del usuario común
         user_ffmpeg_paths = [

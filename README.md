@@ -61,14 +61,39 @@ pip install pytest pytest-cov pytest-asyncio black flake8 mypy pyinstaller
 
 FFmpeg es **requerido** para el funcionamiento de yt-dlp (especialmente para merge de video+audio y conversión de formatos).
 
-#### Instalación en Windows
+#### Instalación en Windows (Desarrollo)
 
 1. Descargar FFmpeg desde: https://www.gyan.dev/ffmpeg/builds/
 2. Extraer el archivo .zip
 3. Agregar la carpeta `bin` al PATH de Windows
 4. Verificar instalación: `ffmpeg -version`
 
-**Nota**: También se puede configurar yt-dlp para usar una ubicación específica de FFmpeg mediante la opción `--ffmpeg-location`.
+#### Uso con el Ejecutable (.exe)
+
+La aplicación busca FFmpeg en el siguiente orden:
+
+1. **Ruta configurada** en Configuración
+2. **PATH del sistema** (donde esté instalado)
+3. **Carpeta del ejecutable** (misma carpeta que el .exe)
+4. **Ubicaciones comunes** del usuario
+
+##### Opción recomendada: Misma carpeta que el .exe
+
+Para que el ejecutable funcione sin instalar nada:
+
+1. Descarga FFmpeg desde https://www.gyan.dev/ffmpeg/builds/
+2. Extrae el contenido
+3. Copia los archivos `ffmpeg.exe` y `ffprobe.exe` (están en la carpeta `bin`)
+4. Pégalos en la **misma carpeta** donde está el `YouTubeDownloader.exe`
+
+```
+YouTubeDownloader/
+├── YouTubeDownloader.exe    ← Tu app
+├── ffmpeg.exe              ← Copiado aquí
+└── ffprobe.exe             ← Copiado aquí
+```
+
+Esta es la forma más fácil de distribuir la app - solo llevás esos 3 archivos y funciona en cualquier PC con Windows 10/11.
 
 ## Estructura del Proyecto
 
