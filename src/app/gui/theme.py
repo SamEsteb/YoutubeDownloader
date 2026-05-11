@@ -63,7 +63,7 @@ class Fonts:
 APP_CONFIG = {
     "title": "YouTube Downloader",
     "min_width": 500,
-    "min_height": 500,
+    "min_height": 450,
     "default_theme": "system",
     "default_color": "dark-blue",  # Color base para CustomTkinter
 }

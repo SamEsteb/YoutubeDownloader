@@ -52,36 +52,40 @@ class DownloadTab(ctk.CTkFrame):
         # Título
         ctk.CTkLabel(
             self,
-            text="⬇️ YouTube Downloader",
+            text="YouTube Downloader",
             font=Fonts.TITLE,
             text_color=self._colors["text"],
         ).pack(pady=(20, 15))
         
         # === Input URL ===
+        self._url_frame = ctk.CTkFrame(self, fg_color="transparent")
+        self._url_frame.pack(fill="x", padx=25, pady=(0, 15))
+        
         self._url_entry = ctk.CTkEntry(
-            self,
+            self._url_frame,
             placeholder_text="Pega la URL de YouTube aquí...",
             font=Fonts.DEFAULT,
             height=45,
             border_color=self._colors["border"],
             fg_color=self._colors["bg_secondary"],
         )
-        self._url_entry.pack(fill="x", padx=25, pady=(0, 10))
+        self._url_entry.pack(side="left", fill="x", expand=True, padx=(0, 10))
         self._url_entry.bind("<Return>", lambda e: self._on_get_info())
         
-        # Botón obtener info
+        # Botón obtener info (solo lupa)
         self._get_info_button = ctk.CTkButton(
-            self,
-            text="🔍 Obtener info",
+            self._url_frame,
+            text="🔍",
             command=self._on_get_info,
             font=Fonts.DEFAULT,
-            height=35,
+            width=45,
+            height=45,
             fg_color=self._colors["button"],
             hover_color=self._colors["button_hover"],
             text_color=self._colors["text"],
             border_width=0,
         )
-        self._get_info_button.pack(fill="x", padx=25, pady=(0, 15))
+        self._get_info_button.pack(side="right")
         
         # === Info del video (se muestra después de buscar) ===
         self._info_card = ctk.CTkFrame(
@@ -275,7 +279,7 @@ class DownloadTab(ctk.CTkFrame):
             self._show_error("Ingresa una URL de YouTube")
             return
         
-        self._get_info_button.configure(state="disabled", text="Buscando...")
+        self._get_info_button.configure(state="disabled", text="⏳")
         
         def get_info():
             try:
@@ -302,7 +306,7 @@ class DownloadTab(ctk.CTkFrame):
                 self.after(0, lambda: self._show_error(f"Error: {str(e)}"))
             finally:
                 self.after(0, lambda: self._get_info_button.configure(
-                    state="normal", text="🔍 Obtener info"
+                    state="normal", text="🔍"
                 ))
         
         thread = threading.Thread(target=get_info, daemon=True)

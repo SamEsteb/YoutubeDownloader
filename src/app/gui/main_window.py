@@ -12,7 +12,7 @@ import customtkinter as ctk
 from core import get_config_manager
 from gui.download_tab import DownloadTab
 from gui.settings_tab import SettingsTab
-from gui.theme import APP_CONFIG, set_appearance_mode, get_current_colors
+from gui.theme import APP_CONFIG, set_appearance_mode, get_current_colors, Fonts
 from utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -110,6 +110,8 @@ class MainWindow(ctk.CTk):
         self._tabview._segmented_button.configure(
             fg_color=self._colors["bg_secondary"],
             selected_color=self._colors["accent"],
+            font=Fonts.HEADER,
+            height=30,
         )
         
         # Añadir pestañas
