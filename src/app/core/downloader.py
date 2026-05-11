@@ -156,43 +156,21 @@ class VideoDownloader:
             )
     
     def _find_ffmpeg(self) -> Optional[str]:
-        """Busca FFmpeg en el sistema."""
+        """Busca FFmpeg empaquetado o en la carpeta del ejecutable."""
         import sys
-        
-        # Primero verificar si hay una ruta configurada
-        if self._config.ffmpeg_path:
-            ffmpeg_path = Path(self._config.ffmpeg_path)
-            if ffmpeg_path.exists():
-                # Si es un directorio, buscar ffmpeg.exe dentro
-                if ffmpeg_path.is_dir():
-                    ffmpeg_exe = ffmpeg_path / "bin" / "ffmpeg.exe"
-                    if ffmpeg_exe.exists():
-                        self._logger.info(f"FFmpeg encontrado en ruta configurada: {ffmpeg_exe}")
-                        return str(ffmpeg_exe)
-                # Si es el archivo directo
-                ffmpeg_exe = ffmpeg_path / "ffmpeg.exe"
-                if ffmpeg_exe.exists():
-                    self._logger.info(f"FFmpeg encontrado en ruta configurada: {ffmpeg_exe}")
-                    return str(ffmpeg_exe)
-        
-        # Verificar en PATH usando where (Windows)
-        try:
-            result = subprocess.run(
-                ["where", "ffmpeg"],
-                capture_output=True,
-                text=True,
-                shell=True,
-            )
-            if result.returncode == 0:
-                ffmpeg_path = result.stdout.strip().split("\n")[0]
-                self._logger.info(f"FFmpeg encontrado en PATH: {ffmpeg_path}")
-                return ffmpeg_path
-        except FileNotFoundError:
-            pass
         
         # Verificar en la carpeta del ejecutable (cuando está empaquetado)
         if getattr(sys, 'frozen', False):
             # Estamos en modo empaquetado (PyInstaller)
+            
+            # Buscar en _MEIPASS (archivos incluidos dentro del ejecutable)
+            if hasattr(sys, '_MEIPASS'):
+                meipass_dir = Path(sys._MEIPASS)
+                ffmpeg_meipass = meipass_dir / "ffmpeg.exe"
+                if ffmpeg_meipass.exists():
+                    self._logger.info(f"FFmpeg encontrado en _MEIPASS: {ffmpeg_meipass}")
+                    return str(ffmpeg_meipass)
+            
             exe_dir = Path(sys.executable).parent
             ffmpeg_exe = exe_dir / "ffmpeg.exe"
             if ffmpeg_exe.exists():
@@ -204,18 +182,13 @@ class VideoDownloader:
             if ffmpeg_bin.exists():
                 self._logger.info(f"FFmpeg encontrado en carpeta del exe: {ffmpeg_bin}")
                 return str(ffmpeg_bin)
-        
-        # Verificar ubicación del usuario común
-        user_ffmpeg_paths = [
-            Path("C:/Users/samue/ffmpeg/bin/ffmpeg.exe"),
-            Path("C:/ffmpeg/bin/ffmpeg.exe"),
-            Path.home() / "ffmpeg" / "bin" / "ffmpeg.exe",
-        ]
-        
-        for ffmpeg_path in user_ffmpeg_paths:
-            if ffmpeg_path.exists():
-                self._logger.info(f"FFmpeg encontrado en: {ffmpeg_path}")
-                return str(ffmpeg_path)
+        else:
+            # En modo de desarrollo, buscar en la carpeta de Assets del proyecto
+            project_dir = Path(__file__).parent.parent.parent.parent
+            assets_ffmpeg = project_dir / "Assets" / "ffmpeg.exe"
+            if assets_ffmpeg.exists():
+                self._logger.info(f"FFmpeg encontrado en Assets: {assets_ffmpeg}")
+                return str(assets_ffmpeg)
         
         return None
     
@@ -263,12 +236,12 @@ class VideoDownloader:
             if format_spec:
                 format_str = format_spec
             elif quality == "best":
-                format_str = "bestvideo+bestaudio/best"
+                format_str = "bestvideo+bestaudio[ext=m4a]/bestvideo+bestaudio/best"
             elif quality == "worst":
-                format_str = "worstvideo+worstaudio/worst"
+                format_str = "worstvideo+worstaudio[ext=m4a]/worstvideo+worstaudio/worst"
             else:
                 # Calidad específica
-                format_str = f"bestvideo[height<={quality}]+bestaudio/best[height<={quality}]"
+                format_str = f"bestvideo[height<={quality}]+bestaudio[ext=m4a]/bestvideo[height<={quality}]+bestaudio/best[height<={quality}]"
         
         opts = {
             "format": format_str,
@@ -292,6 +265,10 @@ class VideoDownloader:
                     "preferredquality": audio_quality.replace("k", ""),
                 }
             ]
+        else:
+            # Para video, priorizamos audio m4a (AAC) en format_str para
+            # mayor compatibilidad en Windows y evitar el codec OPUS.
+            pass
         
         # Agregar ruta de FFmpeg si está configurada
         if self._ffmpeg_path:

@@ -44,6 +44,24 @@ class MainWindow(ctk.CTk):
         self.title(APP_CONFIG["title"])
         self.minsize(APP_CONFIG["min_width"], APP_CONFIG["min_height"])
         
+        # Cargar icono
+        icon_path = None
+        if getattr(sys, 'frozen', False):
+            if hasattr(sys, '_MEIPASS'):
+                p = Path(sys._MEIPASS) / "logo.ico"
+                if p.exists():
+                    icon_path = str(p)
+        else:
+            p = Path(__file__).parent.parent.parent.parent / "Assets" / "logo.ico"
+            if p.exists():
+                icon_path = str(p)
+                
+        if icon_path:
+            try:
+                self.iconbitmap(icon_path)
+            except Exception as e:
+                logger.error(f"No se pudo cargar el icono: {e}")
+        
         # Centrar ventana
         self._center_window()
         

@@ -24,7 +24,6 @@ DEFAULT_CONFIG = {
     "output_template": "%(title)s.%(ext)s",
     "overwrite_files": False,
     "theme": "system",
-    "ffmpeg_path": "",  # Vacío = usar PATH del sistema
     "max_concurrent_downloads": 1,
     "download_subtitles": False,
     "subtitles_language": "es",
@@ -42,7 +41,6 @@ class AppConfig:
         output_template: Plantilla para el nombre del archivo.
         overwrite_files: Si True, sobrescribe archivos existentes.
         theme: Tema de la interfaz (system, light, dark).
-        ffmpeg_path: Ruta personalizada a FFmpeg (vacío = usar PATH).
         max_concurrent_downloads: Máximo de descargas simultáneas.
         download_subtitles: Si True, descarga subtítulos.
         subtitles_language: Idioma de subtítulos.
@@ -54,7 +52,6 @@ class AppConfig:
     output_template: str = "%(title)s.%(ext)s"
     overwrite_files: bool = False
     theme: str = "system"
-    ffmpeg_path: str = ""
     max_concurrent_downloads: int = 1
     download_subtitles: bool = False
     subtitles_language: str = "es"
@@ -65,8 +62,11 @@ class AppConfig:
     
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "AppConfig":
-        """Crea una instancia desde un diccionario."""
-        return cls(**data)
+        """Crea una instancia desde un diccionario filtrando claves obsoletas."""
+        import dataclasses
+        valid_keys = {f.name for f in dataclasses.fields(cls)}
+        filtered_data = {k: v for k, v in data.items() if k in valid_keys}
+        return cls(**filtered_data)
 
 
 class ConfigManager:

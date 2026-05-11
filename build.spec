@@ -8,9 +8,24 @@ from pathlib import Path
 # Rutas del proyecto
 src_dir = Path(SPECPATH) / "src"
 app_dir = src_dir / "app"
+assets_dir = Path(SPECPATH) / "Assets"
 
 block_cipher = None
 
+# Buscar ffmpeg.exe para integrarlo
+binaries_list = []
+ffmpeg_path = assets_dir / "ffmpeg.exe"
+if ffmpeg_path.exists():
+    binaries_list.append((str(ffmpeg_path), "."))
+
+# Preparar archivos de datos (datas)
+datas_list = [
+    (app_dir / "gui" / "theme.py", "app/gui"),
+]
+
+logo_path = assets_dir / "logo.ico"
+if logo_path.exists():
+    datas_list.append((str(logo_path), "."))
 
 a = Analysis(
     [src_dir / "main.py"],
@@ -18,10 +33,8 @@ a = Analysis(
         str(src_dir),
         str(app_dir),
     ],
-    binaries=[],
-    datas=[
-        (app_dir / "gui" / "theme.py", "app/gui"),
-    ],
+    binaries=binaries_list,
+    datas=datas_list,
     hiddenimports=[
         # Core modules
         "core.validator",

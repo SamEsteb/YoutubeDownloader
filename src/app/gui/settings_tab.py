@@ -154,47 +154,7 @@ class SettingsTab(ctk.CTkFrame):
         )
         self._overwrite_checkbox.pack(anchor="w", padx=15, pady=10)
         
-        # === Sección: FFmpeg ===
-        ffmpeg_frame = ctk.CTkFrame(self._scroll_frame, fg_color="transparent")
-        ffmpeg_frame.pack(fill="x", pady=(0, 10))
-        
-        ctk.CTkLabel(
-            ffmpeg_frame,
-            text="FFmpeg",
-            font=Fonts.HEADER,
-        ).pack(anchor="w", padx=15, pady=(15, 10))
-        
-        ffmpeg_row = ctk.CTkFrame(ffmpeg_frame, fg_color="transparent")
-        ffmpeg_row.pack(fill="x", padx=15, pady=5)
-        
-        ctk.CTkLabel(
-            ffmpeg_row,
-            text="Ubicación:",
-            width=120,
-            anchor="w",
-        ).pack(side="left")
-        
-        ffmpeg_path = self._config.ffmpeg_path or "PATH del sistema"
-        self._ffmpeg_path_label = ctk.CTkLabel(
-            ffmpeg_row,
-            text=ffmpeg_path[:25] + "..." if len(ffmpeg_path) > 25 else ffmpeg_path,
-        )
-        self._ffmpeg_path_label.pack(side="left")
-        
-        ctk.CTkButton(
-            ffmpeg_row,
-            text="📁",
-            command=self._on_change_ffmpeg_path,
-            width=35,
-            height=28,
-        ).pack(side="left", padx=(10, 0))
-        
-        ctk.CTkLabel(
-            ffmpeg_frame,
-            text="Necesario para extraer audio MP3",
-            font=Fonts.SMALL,
-            text_color="gray",
-        ).pack(anchor="w", padx=15, pady=(0, 15))
+
     
     def _on_theme_changed(self, value: str) -> None:
         """Maneja el cambio de tema."""
@@ -233,18 +193,7 @@ class SettingsTab(ctk.CTkFrame):
         overwrite = self._overwrite_var.get()
         self._config_manager.update(overwrite_files=overwrite)
     
-    def _on_change_ffmpeg_path(self) -> None:
-        """Cambia la ubicación de FFmpeg."""
-        folder = filedialog.askdirectory(
-            title="Seleccionar carpeta de FFmpeg",
-        )
-        
-        if folder:
-            self._config_manager.update(ffmpeg_path=folder)
-            folder_name = Path(folder).name
-            self._ffmpeg_path_label.configure(
-                text=folder_name[:25] + "..." if len(folder_name) > 25 else folder_name
-            )
+
     
     def _show_message(self, message: str) -> None:
         """Muestra un mensaje."""

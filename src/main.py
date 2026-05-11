@@ -6,7 +6,16 @@ Este archivo es el punto de entrada principal de la aplicación.
 
 import sys
 import os
+import ctypes
 from pathlib import Path
+
+# Forzar a Windows a mostrar el icono de la app en la barra de tareas
+if os.name == 'nt':
+    try:
+        app_id = 'youtube_downloader.app.1.0'
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(app_id)
+    except Exception:
+        pass
 
 # Determinar si estamos ejecutando como script o como ejecutable
 if getattr(sys, 'frozen', False):
